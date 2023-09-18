@@ -1,5 +1,3 @@
-#include "DKUtil/Hook.hpp"
-
 /*
 * STARFIELD SFSE MOD
 * Companions Never Lose Affinity.
@@ -13,10 +11,9 @@
 */
 
 uintptr_t BASE_ADDRESS = DKUtil::Hook::Module::get().base();
-using namespace dku::Alias;
 
 template <std::size_t N, typename T = std::uint8_t>
-std::unique_ptr<dku::Hook::ASMPatchHandle> createHook(
+std::unique_ptr<DKUtil::Hook::ASMPatchHandle> createHook(
     uintptr_t targetOffset,
     int targetLength,
     std::array<T, N> opcode)
@@ -28,7 +25,7 @@ std::unique_ptr<dku::Hook::ASMPatchHandle> createHook(
      * @param opcode: New opcode to write with this patch.
      * @returns: ASMPatchHandle that can be enabled.
      */
-    return dku::Hook::AddASMPatch(
+    return DKUtil::Hook::AddASMPatch(
         BASE_ADDRESS + targetOffset,
         std::make_pair(0x0, targetLength),
         { opcode.data(), opcode.size() });
@@ -38,17 +35,18 @@ namespace NoAffinityLossHook
 {
     void Install()
     {
-        // Make the first patch
-        std::array<std::uint8_t, 19> opcode1{
+        // Modifier patch
+        using namespace DKUtil::Alias;
+        std::array<std::uint8_t, 19> opcode{
             0x0F, 0x57, 0xC0, // Set register to 0
             0x0F, 0x2F, 0x41, 0x48, // Compare 0 to new value
             0x72, 0x05, // Jump to write if new value 0 or above
             0xC5, 0xFA, 0x11, 0x41, 0x48, // Write 0 if below
             0xC5, 0xFA, 0x10, 0x41, 0x48 // Write final number
         };
-        auto affinityHook1 = createHook(0x1878AB3, 0x5, opcode1);
-        affinityHook1->Enable();
-        INFO("First area patched!");
+        auto affinityHook = createHook(0x1878AB3, 0x5, opcode);
+        affinityHook->Enable();
+        INFO("Companion affinity modifier patched");
 
     }
 }
