@@ -1,14 +1,15 @@
 {
-    "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
-    "name": "starfield-noaffinityloss",
-    "version-string": "1.0.0",
-    "description": "sfse plugin for starfield",
-    "homepage": "https://github.com/MrTeferi/Starfield-NoAffinityLoss",
-    "dependencies": [
-        "spdlog",
-        "nlohmann-json",
-        "simpleini",
-        "tomlplusplus",
-        "xbyak"
-    ]
+  "$schema": "https://raw.githubusercontent.com/microsoft/vcpkg-tool/main/docs/vcpkg.schema.json",
+  "name": "starfield-noaffinityloss",
+  "version-string": "1.2.0",
+  "description": "SFSE mod for Starfield disabling companion affinity loss.",
+  "homepage": "https://github.com/MrTeferi/Starfield-NoAffinityLoss",
+  "dependencies": [
+    "spdlog",
+    "nlohmann-json",
+    "simpleini",
+    "tomlplusplus",
+    "xbyak"
+  ],
+  "builtin-baseline": "e8c2a04eb7ca058b6e2f0e6e33c67fdbffeee846"
 }
