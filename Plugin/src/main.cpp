@@ -10,8 +10,6 @@
 * - Starfield.exe + 0x2A324D0 [Deprecated, wasn't needed, caused issues]
 */
 
-uintptr_t BASE_ADDRESS = DKUtil::Hook::Module::get().base();
-
 template <std::size_t N, typename T = std::uint8_t>
 std::unique_ptr<DKUtil::Hook::ASMPatchHandle> createHook(
     uintptr_t targetOffset,
@@ -25,6 +23,7 @@ std::unique_ptr<DKUtil::Hook::ASMPatchHandle> createHook(
      * @param opcode: New opcode to write with this patch.
      * @returns: ASMPatchHandle that can be enabled.
      */
+    uintptr_t BASE_ADDRESS = DKUtil::Hook::Module::get().base();
     return DKUtil::Hook::AddASMPatch(
         BASE_ADDRESS + targetOffset,
         std::make_pair(0x0, targetLength),
@@ -47,7 +46,6 @@ namespace NoAffinityLossHook
         auto affinityHook = createHook(0x1878AB3, 0x5, opcode);
         affinityHook->Enable();
         INFO("Companion affinity modifier patched");
-
     }
 }
 
@@ -61,7 +59,10 @@ DLLEXPORT constinit auto SFSEPlugin_Version = []() noexcept {
 	//data.UsesAddressLibrary(true);
 	data.HasNoStructUse(true);
 	//data.IsLayoutDependent(true);
-	data.CompatibleVersions({ SFSE::RUNTIME_LATEST });
+	data.CompatibleVersions({
+        SFSE::RUNTIME_SF_1_7_23,
+        SFSE::RUNTIME_SF_1_7_29,
+        SFSE::RUNTIME_LATEST });
 
 	return data;
 }();
@@ -90,18 +91,18 @@ void SFSEPlugin_Preload(SFSE::LoadInterface* a_sfse);
 
 DLLEXPORT bool SFSEAPI SFSEPlugin_Load(const SFSE::LoadInterface* a_sfse)
 {
-/**#ifndef NDEBUG
+#ifndef NDEBUG
     // Current disabled due to infinite loop even on built release
 	while (!IsDebuggerPresent()) {
 		Sleep(100);
 	}
-#endif**/
+#endif
 
 	SFSE::Init(a_sfse, false);
 
 	DKUtil::Logger::Init(Plugin::NAME, std::to_string(Plugin::Version));
 
-	INFO("{} v{} loaded", Plugin::NAME, Plugin::Version);
+    INFO("{} v{} loaded", Plugin::NAME, Plugin::Version);
 
 	// Set up our plugin
 	SFSE::AllocTrampoline(1 << 8);
